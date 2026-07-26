@@ -159,27 +159,32 @@ def solver_worker(clauses, nv, solver_name, queue):
         queue.put(("Error",str(e),None))
 
 def solve_k_with_timeout(total_num, total_adj, k , timeout_sec, solver_name = "glucose3"):
+    t0_encoding = time.time()
     clauses, nv = build_cnf(total_num, total_adj, k)
+    t_encoding = time.time() - t0_encoding
 
     ctx = mp.get_context("spawn")
     q = ctx.Queue()
     p = ctx.Process(target=solver_worker, args=(clauses, nv, solver_name, q))
     p.start()
+
+    t0_solving = time.time()
     p.join(timeout_sec)
+    t_solving = time.time() - t0_solving
 
     if p.is_alive():
         p.terminate()
         p.join()
-        return "TIMEOUT", None
+        return "TIMEOUT", None, t_encoding, t_solving, len(clauses), nv
     
     if not q.empty():
         tag, sat, model = q.get()
         if tag == "Done":
-            return ("SAT" if sat else "UNSAT"), model
+            return ("SAT" if sat else "UNSAT"), model, t_encoding, t_solving, len(clauses), nv
         else:
-            return "ERROR", None
+            return "ERROR", None, t_encoding, t_solving, len(clauses), nv
         
-    return "TIMEOUT", None
+    return "TIMEOUT", None, t_encoding, t_solving, len(clauses), nv
 
 def find_total_chromatic_number(adj, timeout_sec = 1800, max_extra = 4, verbose = True, solver_name="glucose3"):
     total_num, total_adj, delta, num_v, num_e = build_total_graph(adj)
@@ -187,17 +192,43 @@ def find_total_chromatic_number(adj, timeout_sec = 1800, max_extra = 4, verbose 
 
     history = []
     chi_T = None
-    for k in range(lower_bound, lower_bound + max_extra + 1):
+    final_status = "timeout"
+    span_value = None
+    t_encoding_total = 0.0
+    t_solving_total = 0.0
+    vars_count = 0
+    clauses_count = 0
+    last_sat_k = None
+
+    for k in [lower_bound + 1, lower_bound]:
         t0 = time.time()
-        status, model = solve_k_with_timeout(total_num, total_adj, k, timeout_sec, solver_name)
+        status, model, enc_time, solve_time, clauses_num, vars_num = solve_k_with_timeout(total_num, total_adj, k, timeout_sec, solver_name)
         dt = time.time() - t0
+        t_encoding_total += enc_time
+        t_solving_total += solve_time
+        vars_count = vars_num
+        clauses_count = clauses_num
         history.append({"k":k, "status": status, "time_sec":round(dt, 2)})
         if verbose:
             print(f" k={k:>3} -> {status:<8} ({dt:8.2f}s)")
+
         if status == "SAT":
-            chi_T = k
+            last_sat_k = k
+            if k == lower_bound:
+                chi_T = k
+                final_status = "optimal"
+                break
+            continue
+
+        elif status == "UNSAT":
+            if last_sat_k is not None:
+                chi_T = last_sat_k
+                final_status = "optimal"
             break
-        if status in ("TIMEOUT", "ERROR"):
+
+        elif status in ("TIMEOUT", "ERROR"):
+            final_status = "timeout"
+            chi_T = last_sat_k if last_sat_k is not None else None
             break
 
     return {
@@ -205,6 +236,13 @@ def find_total_chromatic_number(adj, timeout_sec = 1800, max_extra = 4, verbose 
             "m": num_e,
             "delta": delta,
             "chi_T": chi_T,
+            "vars": vars_count,
+            "clauses": clauses_count,
+            "t_encoding_sec": round(t_encoding_total, 2),
+            "t_solving_sec": round(t_solving_total, 2),
+            "t_total_sec": round(t_encoding_total + t_solving_total, 2),
+            "status": final_status,
+            "span": last_sat_k if last_sat_k is not None else "UNKNOWN",
             "history": history,
         }
 
@@ -215,7 +253,7 @@ def run_batch(data_dir, timeout_sec, out_csv, solver_name="glucose3"):
         print(f"Khong tim thay file .list nao trong: {data_dir}")
         return 
     
-    fieldnames = ["graph", "n", "m", "delta", "chi_T", "total_time_sec", "detail"]
+    fieldnames = ["instance_name", "|V|", "|E|", "vars", "clauses", "t_encoding", "t_solving", "t_total", "status", "span", "chi_T"]
     rows = []
     
     for path in files:
@@ -230,22 +268,22 @@ def run_batch(data_dir, timeout_sec, out_csv, solver_name="glucose3"):
         result = find_total_chromatic_number(adj, timeout_sec=timeout_sec, solver_name=solver_name)
         total_time = time.time() - t_start
 
-        detail = "; ".join(
-            f"k={h['k']}:{h['status']}({h['time_sec']}s)" for h in result["history"]
-        )
-
         row = {
-            "graph": name,
-            "n": result["n"],
-            "m": result["m"],
-            "delta": result["delta"],
+            "instance_name": name,
+            "|V|": result["n"],
+            "|E|": result["m"],
+            "vars": result["vars"],
+            "clauses": result["clauses"],
+            "t_encoding": result["t_encoding_sec"],
+            "t_solving": result["t_solving_sec"],
+            "t_total": round(total_time, 2),
+            "status": result["status"],
+            "span": result["span"],
             "chi_T": result["chi_T"] if result["chi_T"] is not None else "UNKNOWN",
-            "total_time_sec": round(total_time, 2),
-            "detail": detail,
         }
         rows.append(row)
 
-        print(f" => chi_T({name}) = {row['chi_T']}  (tong thoi gian: {total_time:.2f}s))")
+        print(f" => {name}: status={row['status']}, span={row['span']}, chi_T={result['chi_T']}, t_total={row['t_total']:.2f}s")
 
         with open(out_csv, "w", newline="", encoding = "utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
