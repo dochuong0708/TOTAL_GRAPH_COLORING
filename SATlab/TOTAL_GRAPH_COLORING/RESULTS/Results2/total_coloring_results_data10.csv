@@ -1,0 +1,11 @@
+instance_name,|V|,|E|,vars,clauses,t_encoding,t_solving,t_total,status,span,delta,chi_T
+1-Tetrahedron,4,6,80,270,0.0,0.15,0.36,optimal,5,3,5
+10-The Icosahedron,12,30,504,2226,0.0,0.15,0.31,optimal,6,5,6
+11-The Chvátal Graph,12,24,360,1404,0.0,0.15,0.32,optimal,5,4,5
+12-The Bondy-Murty Graph G-3,14,21,280,945,0.0,0.15,0.3,optimal,4,3,4
+13-The Bondy-Murty Graph G-4,16,15,248,725,0.0,0.16,0.35,optimal,4,3,4
+14-The Ramsey Graph,17,59,1368,7439,0.01,0.2,0.47,optimal,9,8,9
+15-The Dodecahedron,20,30,400,1350,0.0,0.17,0.34,optimal,4,3,4
+16-the Mycielski 5 - Chromatic Graph,23,71,2256,11894,0.01,0.11,0.4,optimal,12,11,12
+17-The Grünbaum Graph,25,50,750,2925,0.0,0.17,0.37,optimal,5,4,5
+18-The Map of India,30,61,1820,7879,0.0,0.12,0.32,optimal,10,9,10

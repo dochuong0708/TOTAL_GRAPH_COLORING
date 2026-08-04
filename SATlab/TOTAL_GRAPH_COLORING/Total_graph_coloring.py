@@ -15,10 +15,15 @@ def read_file_graph(path):
     with open(path, "r", encoding = "utf-8") as f:
         for line in f:
             line = line.strip()
-            if not line: 
+            if not line:
+                continue
+            if ":" not in line:
                 continue
             head, _, rest = line.partition(":")
-            u = int(head.strip())
+            try:
+                u = int(head.strip())
+            except ValueError:
+                continue
             neighbors = list(map(int, rest.split())) if rest.strip() else []
             adj[u] = neighbors
     if not adj:
@@ -248,12 +253,16 @@ def find_total_chromatic_number(adj, timeout_sec = 1800, max_extra = 4, verbose 
 
 
 def run_batch(data_dir, timeout_sec, out_csv, solver_name="glucose3"):
-    files = sorted(glob.glob(os.path.join(data_dir, "*.lst")))
+    supported_exts = (".lst", ".txt")
+    files = []
+    for ext in supported_exts:
+        files.extend(glob.glob(os.path.join(data_dir, f"*{ext}")))
+    files = sorted(files)
     if not files:
-        print(f"Khong tim thay file .list nao trong: {data_dir}")
+        print(f"Khong tim thay file do thi (.lst/.txt) nao trong: {data_dir}")
         return 
     
-    fieldnames = ["instance_name", "|V|", "|E|", "vars", "clauses", "t_encoding", "t_solving", "t_total", "status", "span", "chi_T"]
+    fieldnames = ["instance_name", "|V|", "|E|", "vars", "clauses", "t_encoding", "t_solving", "t_total", "status", "span", "delta", "chi_T"]
     rows = []
     
     for path in files:
@@ -279,11 +288,16 @@ def run_batch(data_dir, timeout_sec, out_csv, solver_name="glucose3"):
             "t_total": round(total_time, 2),
             "status": result["status"],
             "span": result["span"],
+            "delta": result["delta"],
             "chi_T": result["chi_T"] if result["chi_T"] is not None else "UNKNOWN",
         }
         rows.append(row)
 
-        print(f" => {name}: status={row['status']}, span={row['span']}, chi_T={result['chi_T']}, t_total={row['t_total']:.2f}s")
+        print(f" => {name}: status={row['status']}, span={row['span']}, delta = {result['delta']}, chi_T={result['chi_T']}, t_total={row['t_total']:.2f}s")
+
+        parent_dir = os.path.dirname(out_csv)
+        if parent_dir:
+            os.makedirs(parent_dir, exist_ok=True)
 
         with open(out_csv, "w", newline="", encoding = "utf-8") as f:
             writer = csv.DictWriter(f, fieldnames=fieldnames)
@@ -299,7 +313,7 @@ def main():
     )
     parser.add_argument(
         "--data-dir", required=True,
-        help="Thu muc chua cac file do thi dang .lst (danh sach ke, 1-indexed)."
+        help="Thu muc chua cac file do thi dang .lst hoac .txt (danh sach ke, 1-indexed)."
     )
     parser.add_argument(
         "--timeout", type=int, default=1800,
