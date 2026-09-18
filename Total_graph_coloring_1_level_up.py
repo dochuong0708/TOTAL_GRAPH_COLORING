@@ -8,7 +8,7 @@ from datetime import datetime
 from pysat.solvers import Solver
 
 
-def read_file_graph(path):s
+def read_file_graph(path):
     adj = {}
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
@@ -117,11 +117,11 @@ def build_cnf_order(total_num, total_adj, k, use_symmetry_breaking=True):
                     yv = y[(v, k)]
                     clauses.append([-xu, -yv])
 
-    if use_symmetry_breaking and k >= 2:
-        u0 = max(total_adj.keys(), key=lambda v: len(total_adj[v]))
-        mid_idx = (k + 1) // 2 + 1
-        if mid_idx <= k:
-            clauses.append([-y[(u0, mid_idx)]])
+    # if use_symmetry_breaking and k >= 2:
+    #     u0 = max(total_adj.keys(), key=lambda v: len(total_adj[v]))
+    #     mid_idx = (k + 1) // 2 + 1
+    #     if mid_idx <= k:
+    #         clauses.append([-y[(u0, mid_idx)]])
 
     return clauses, nv, y
 

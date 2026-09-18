@@ -1,0 +1,6 @@
+----> Buổi 6:
+
+-> PP2: chuyển seq, bỏ SB, chạy trong 10p 
+-> tìm hiểu vì sao code cũ ko chạy đc? (cả 2)
+-> Dùng quy hoạch số nguyên để cài lại bài toán 
+-> Lấy bản quyền cplex, cài Gurobi
