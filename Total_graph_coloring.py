@@ -8,7 +8,7 @@ from datetime import datetime
 from pysat.solvers import Solver
 
 
-def read_file_graph(path):
+def read_file_graph(path):s
     adj = {}
     with open(path, "r", encoding="utf-8") as f:
         for line in f:
@@ -75,7 +75,6 @@ def build_total_graph(adj):
 
 
 def build_cnf_order(total_num, total_adj, k, use_symmetry_breaking=True):
-    """Tạo CNF Order Encoding cho k màu và áp dụng Symmetry Breaking."""
     y, x = {}, {}
     nv = 0
     for u in range(total_num):
@@ -118,7 +117,6 @@ def build_cnf_order(total_num, total_adj, k, use_symmetry_breaking=True):
                     yv = y[(v, k)]
                     clauses.append([-xu, -yv])
 
-    # Symmetry breaking: Giới hạn c(u0) <= (k + 1) // 2
     if use_symmetry_breaking and k >= 2:
         u0 = max(total_adj.keys(), key=lambda v: len(total_adj[v]))
         mid_idx = (k + 1) // 2 + 1
@@ -280,9 +278,6 @@ def find_total_chromatic_number(
     q.close()
     q.cancel_join_thread()
 
-    # -------------------------------------------------------------------------
-    # TÍNH TOÁN KẾT QUẢ CUỐI CÙNG
-    # -------------------------------------------------------------------------
     if has_error:
         final_status = "error"
         chi_T = None

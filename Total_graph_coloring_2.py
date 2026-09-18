@@ -30,7 +30,6 @@ def read_file_graph(path):
         if v not in adj:
             adj[v] = []
 
-    # ĐỐI XỨNG HÓA DANH SÁCH KỀ (Đảm bảo đồ thị vô hướng chuẩn)
     for u in list(adj.keys()):
         for v in adj[u]:
             if 1 <= v <= n and u not in adj[v]:
@@ -54,13 +53,11 @@ def build_total_graph(adj):
     for i in range(total_num):
         total_adj[i] = set()
 
-    # 1. Đỉnh kề Đỉnh
     for u in vertices:
         for v in adj[u]:
             if u != v:
                 total_adj[u - 1].add(v - 1)
 
-    # 2. Đỉnh liên thuộc Cạnh
     incident_at = {v: [] for v in vertices}
     for idx, (u, v) in enumerate(edges):
         eid = num_v + idx
@@ -71,7 +68,6 @@ def build_total_graph(adj):
         incident_at[u].append(idx)
         incident_at[v].append(idx)
 
-    # 3. Cạnh kề Cạnh
     for v in vertices:
         inc = incident_at[v]
         for i in range(len(inc)):
@@ -85,7 +81,6 @@ def build_total_graph(adj):
 
 
 def build_direct_cnf(total_num, total_adj, k, use_symmetry_breaking=True):
-    """Mã hóa Direct Encoding cho k màu và áp dụng Phá vỡ tính đối xứng chuẩn như PP1."""
     x = {}
     nv = 0
     for o in range(total_num):
@@ -95,17 +90,16 @@ def build_direct_cnf(total_num, total_adj, k, use_symmetry_breaking=True):
 
     clauses = []
 
-    # 1. AT LEAST ONE
+
     for o in range(total_num):
         clauses.append([x[(o, i)] for i in range(1, k + 1)])
 
-    # 2. AT MOST ONE
+
     for o in range(total_num):
         for i in range(1, k + 1):
             for j in range(i + 1, k + 1):
                 clauses.append([-x[(o, i)], -x[(o, j)]])
 
-    # 3. CONFLICT CLAUSES
     for u in range(total_num):
         for v in total_adj[u]:
             if v <= u:
@@ -113,7 +107,6 @@ def build_direct_cnf(total_num, total_adj, k, use_symmetry_breaking=True):
             for i in range(1, k + 1):
                 clauses.append([-x[(u, i)], -x[(v, i)]])
 
-    # 4. SYMMETRY BREAKING: Giới hạn c(u0) <= (k + 1) // 2 cho đỉnh u0 có bậc lớn nhất trong T(G)
     if use_symmetry_breaking and k >= 2:
         u0 = max(total_adj.keys(), key=lambda v: len(total_adj[v]))
         max_allowed_color = (k + 1) // 2
@@ -126,12 +119,10 @@ def build_direct_cnf(total_num, total_adj, k, use_symmetry_breaking=True):
 def solver_worker_incremental(
     total_num, total_adj, delta, solver_name, queue, use_symmetry_breaking=True
 ):
-    """Worker giải k = Delta + 2, giữ nguyên Solver và cấm màu (Delta + 2) để giải tiếp k = Delta + 1."""
     try:
         k2 = delta + 2
         k1 = delta + 1
 
-        # BƯỚC 1: Dựng CNF Direct Encoding cho k = Delta + 2
         t0_enc = time.time()
         clauses, nv, x = build_direct_cnf(
             total_num, total_adj, k2, use_symmetry_breaking
@@ -157,7 +148,6 @@ def solver_worker_incremental(
             solver.delete()
             return
 
-        # BƯỚC 2: Tận dụng Solver cũ, CẤM DÙNG MÀU (Delta + 2) cho mọi phần tử u
         extra_unit_clauses = [[-x[(u, k2)]] for u in range(total_num)]
         for cl in extra_unit_clauses:
             solver.add_clause(cl)
@@ -273,8 +263,6 @@ def find_total_chromatic_number(
 
     q.close()
     q.cancel_join_thread()
-
-    # Xác định trạng thái và sắc tố tổng chi_T
     if has_error:
         final_status = "error"
         chi_T = None
@@ -343,7 +331,6 @@ def run_batch(data_dir, timeout_sec, out_csv, solver_name="cadical153"):
         name = os.path.splitext(os.path.basename(path))[0]
         print(f"\n==={name}===")
 
-        # Đo thời gian tổng thực tế từ bước đọc file
         t_instance_start = time.time()
 
         adj = read_file_graph(path)
