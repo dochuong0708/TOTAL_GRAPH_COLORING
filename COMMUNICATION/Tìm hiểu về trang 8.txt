@@ -1,0 +1,10 @@
+Tìm hiểu về trang 8:
+- Ý tưởng: sắp xếp thứ tự các đỉnh 
+-> so index của đỉnh với màu 
+
+- Công thức:
++ Yv,i -> đỉnh v nằm ở vị trí liên quan đến mức i 
+-> Phủ Yv,k: ? (-> đảm bảo đỉnh cuối cùng có một màu) 
+-> Yv,i tuyển phủ Yv,i+1: ( nếu v ko liên quan đến mức i thì cũng sẽ ko liên quan đến mức i+1) -> biến thành dạng nhị phân và mức đầu tiên = 0 sẽ là màu của đỉnh đó
+-> Yu,1 tuyển Yv,1: đảm bảo 2 đỉnh gần nhau ko cùng màu 1 -> tại sao lại kiểm soát màu 1 
+-> phủ Yu,i-1 tuyển Yu,i tuyển phủ Yv,i-1 tuyển Yv,i: 2 đỉnh kề nhau ko cùng 1 màu -> ?

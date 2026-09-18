@@ -1,0 +1,15 @@
+tính đối xứng?
+
+-> tìm u<->delta 
+
+-> cố định x(u)=1 và các cạnh liên thuộc với nó
+
+vậy còn tính đối xứng này là gì?
+
+tổng xích ma từ i=1 đến k của x(o,i) = 1 với o thuộc E + V
+
+tổng xích ma từ i=1 đến k của x(o,i) <= 1 với o là các (cạnh đỉnh)(cạnh cạnh) liên thuộc
+
+x(u,i) -> phủ x(v,i)
+
+Đọc trang 8 

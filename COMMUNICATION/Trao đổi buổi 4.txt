@@ -1,0 +1,4 @@
+Trao đổi buổi 4: 
+-> Xử lí timeout đúng giờ
+-> Từ mô hình SAT -> SAT tô màu -> xem biến nào true thì là màu gì
+-> Cách phá vỡ tính đối xứng: c(u) = k + 1 - a (với c(u) = a)

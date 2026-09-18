@@ -1,0 +1,6 @@
+Trao đổi buổi 5:
+-> 1800s: từ đọc đồ thị -> giải 
+-> pp2: trên xuống
+-> symmetry breaking: c(u) = k + 1 - c(u), -y(u,y/2 + 1) -> pp1
+-> Giữ nguyên mệnh đề của delta + 2, thêm mệnh đề để chặn: c(u) < 6, -y(u,k) -> pp1.2
+

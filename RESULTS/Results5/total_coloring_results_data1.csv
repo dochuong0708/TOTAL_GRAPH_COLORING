@@ -1,0 +1,16 @@
+instance_name,|V|,|E|,vars,clauses,t_encoding,t_solving,t_total,status,span,delta,chi_T
+1-Tetrahedron,4,6,80,270,0.0,0.19,0.61,optimal,5,3,5
+10-The Icosahedron,12,30,504,2226,0.0,0.2,0.46,optimal,6,5,6
+11-The Chvátal Graph,12,24,360,1404,0.0,0.23,0.44,optimal,5,4,5
+12-The Bondy-Murty Graph G-3,14,21,280,945,0.0,0.19,0.41,optimal,4,3,4
+13-The Bondy-Murty Graph G-4,16,15,248,725,0.0,0.2,0.39,optimal,4,3,4
+14-The Ramsey Graph,17,59,1368,7439,0.01,0.21,0.42,optimal,9,8,9
+15-The Dodecahedron,20,30,400,1350,0.0,0.29,0.64,optimal,4,3,4
+16-the Mycielski 5 - Chromatic Graph,23,71,2256,11894,0.01,0.12,0.5,optimal,12,11,12
+17-The Grünbaum Graph,25,50,750,2925,0.0,0.2,0.39,optimal,5,4,5
+18-The Map of India,30,61,1820,7879,0.01,0.17,0.5,optimal,10,9,10
+19-the Mycielski 6 - Chromatic Graph,47,236,13584,105965,0.14,0.47,1.12,optimal,24,23,24
+2-The kuratowski Bipartie Graph,6,9,120,405,0.0,0.19,0.4,optimal,5,3,5
+20-2-FullIns_3,52,201,8096,51027,0.04,0.24,0.72,optimal,16,15,16
+21-3-FullIns_3,80,346,17892,126099,0.05,3600.06,3600.43,timeout,UNKNOWN,19,UNKNOWN
+22-1-FullIns_4,93,593,46648,438288,0.45,3600.02,3601.12,timeout,UNKNOWN,32,UNKNOWN
