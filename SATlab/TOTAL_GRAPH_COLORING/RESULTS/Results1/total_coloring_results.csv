@@ -1,2 +1,0 @@
-instance_name,|V|,|E|,vars,clauses,t_encoding,t_solving,t_total,status,span,chi_T
-chvatal,12,24,360,1404,0.0,0.29,0.71,optimal,5,5

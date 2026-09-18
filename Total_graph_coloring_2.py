@@ -100,6 +100,8 @@ def build_direct_cnf(total_num, total_adj, k, use_symmetry_breaking=True):
             for j in range(i + 1, k + 1):
                 clauses.append([-x[(o, i)], -x[(o, j)]])
 
+
+
     for u in range(total_num):
         for v in total_adj[u]:
             if v <= u:
@@ -107,11 +109,11 @@ def build_direct_cnf(total_num, total_adj, k, use_symmetry_breaking=True):
             for i in range(1, k + 1):
                 clauses.append([-x[(u, i)], -x[(v, i)]])
 
-    if use_symmetry_breaking and k >= 2:
-        u0 = max(total_adj.keys(), key=lambda v: len(total_adj[v]))
-        max_allowed_color = (k + 1) // 2
-        for c in range(max_allowed_color + 1, k + 1):
-            clauses.append([-x[(u0, c)]])
+    # if use_symmetry_breaking and k >= 2:
+    #     u0 = max(total_adj.keys(), key=lambda v: len(total_adj[v]))
+    #     max_allowed_color = (k + 1) // 2
+    #     for c in range(max_allowed_color + 1, k + 1):
+    #         clauses.append([-x[(u0, c)]])
 
     return clauses, nv, x
 
