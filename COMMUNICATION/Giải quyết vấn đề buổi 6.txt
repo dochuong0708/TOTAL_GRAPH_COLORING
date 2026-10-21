@@ -1,0 +1,50 @@
+----- Giải quyết vấn đề buổi 6:
+
++> Ở pp2 khi sử dụng seq và bỏ đi SB thì kết quả cũng không thay đổi nhiều so với ban đầu
+-> thay đổi không đáng kể
+
++> Giải thích vì sao code cũ của cả 2 pp2 đều không chạy được các đồ thị có số đỉnh và cạnh lớn
+
+--> Ở code cũ có xuất hiện 2 hàm solver là solver_worker và solver_k_with_timout
+
+--------> Ở đây là thiết kê theo kiểu tách biệt nhiệm vụ như là hàm S_W thì là hàm thực thi khi chỉ cần nhận danh sách mệnh đề đã được tạo sẵn, nặp vào SAT solver và gọi lên solver() là chạy
+
+--------> hàm S_K_W_T thì như một hàm quản lí làm nhiệm vụ chuẩn bị và quản lí, ví dụ như gọi hàm build_cnf để tạo các mệnh đề và tạo tiến trình con để chạy solver_worker
+
+=> Vậy thì tại sao code cũ khi chạy lại bị treo????
+
+(*) Lý do là: gặp phải điểm nghẽn khi xử lí đa tiến trình
+
+----> Cụ thể: Tiến trình mẹ tạo ra lượng mệnh đề rất lớn, sau đó đóng gói chúng lại là chuyển qua đường ống IPC tới các tiến trình con và tại đó giải nén rồi nạp vào Solver và bắt đầu giải
+
+----> Sự bùng nổi mệnh đề: 
+
+(+) Ban đầu có n đỉnh và m cạnh
+(+) Khi chuyển sang đồ thị tổng quát thì 1 đỉnh 1 cạnh kề nhau sẽ tạo ra số cạnh là 2m 
+(+) 2 cạnh kề nhau khi chuyển sang đồ thị mới sẽ tạo ra d(v)C2 cạnh
+
+=> Như vậy khi chuyển sang đồ thị tổng quát, số cạnh tăng lên rất nhiều và kéo theo mệnh đề mới được tạo ra cũng sẽ nhiều thêm vì phải xét mqh giữa các đỉnh mới của đồ thị với nhau và thử từng màu cho 1 cạnh đó
+
+-> Ví dụ khi có 200 cạnh và có 10 màu thì mỗi cạnh sẽ được thử 10 màu cho đến khi chọn được màu phù hợp, vậy nên phải qua 2000 lần ta mới có thể thử xong và điều này tăng theo cấp số nhân 
+
+
+(*) Hiện tượng thắt cổ chai xảy ra khi truyền dữ liệu qua IPC vì: 
+
++> Khi có n mệnh đề( đây ko phải là dữ liệu thô -> đối tượng này coi là list) và đóng gói các đối tượng list phức tạp này trong bộ nhớ -> để gửi danh sách này sang cho tiến trình con, python sẽ phải chuyển hoad thành bye và việc này xử lí cực kì tốn thời gian để xử lí chuỗi
+
++> Khi gửi đi đã mất nhiều RAM để xử lí, đóng gói truyền đi cũng mất thêm vì tạo ra bản sao, khi tiến trình con nhận xong cũng tạo ra bản sao nữa => như vậy một lần xử lí tốn quá nhiều RAM
+
+
+
+======> Câu hỏi: code mới làm ntn để giải quyết vấn đề này????
+
++> Thứ nhất là chuyển logic sinh CNF sang cho tiến trình con, trước là mẹ phải sinh mệnh đề sau đó đóng gói và chuyển đi, nay con tự làm tự ăn
+Cụ thể: 
+-> Truyền dữ liệu siêu nhẹ: chỉ cần truyền cấu trúc độ thị tổng quát
+-> Tự khởi tạo và sinh mệnh đề trên chính ram của nó nên ko mất thêm ram để lưu bản sao 
+-> Mệnh đề được tạo nạp luôn vào bộ giải solver ko thông qua bất cứ một bản sao nào
+
++> Thứ hai là sử dụng incremental cho phép ghi nhớ những mệnh đề đã được sinh và dùng cho các trường hợp sau 
+
+
+

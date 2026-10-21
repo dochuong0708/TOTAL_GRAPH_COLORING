@@ -1,0 +1,10 @@
+Prepare for lesson 7:
+
++> Get API key of gurobi
+
++> Check clauses of SAT
+
++> Get API key of Cplex
+
++> Check read_file and check data
+

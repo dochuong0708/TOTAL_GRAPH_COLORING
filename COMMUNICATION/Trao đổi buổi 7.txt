@@ -1,0 +1,7 @@
+Trao đổi buổi 7: 
+
++> Cài lại quy hoạch số nguyên với ILP của bài báo 2022
+
++> Kiểm tra xem mô hình ILP này có giống mô hình AI sinh ra không?
+
++> Kiểm tra xem code trong bài báo 2022 là tìm lb hay là tìm chính xác, nếu tìm chính xác thì sẽ chạy lại trên 27 đồ thị 
